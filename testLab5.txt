@@ -1,0 +1,4 @@
+Bob:20
+Joe:15.00
+Billy:10.
+Sally:hi
