@@ -123,26 +123,34 @@ class Reversi():
                 if checkDirection[i][0]<position[0]:
                     print("up")
                     if checkDirection[i][1]==position[1]:
+                        print("straight up")
                         return self.isPositionValid(checkDirection[i], colour, "up")
                     elif checkDirection[i][1]==position[1]+1:
+                        print("up and right")
                         return self.isPositionValid(checkDirection[i], colour, "ru")
                     else:
+                        print("up and left")
                         return self.isPositionValid(checkDirection[i], colour, "lu")
                     
                 if checkDirection[i][0]==position[0]:
                     print("left or right")
                     if checkDirection[i][1]==position[1]+1:
+                        print("right")
                         return self.isPositionValid(checkDirection[i], colour, "right")
                     else:
+                        print("left")
                         return self.isPositionValid(checkDirection[i], colour, "left")
                     
                 else:
                     print("down")
                     if checkDirection[i][1]==position[1]:
+                        print("straight down")
                         return self.isPositionValid(checkDirection[i], colour, "down")
                     elif checkDirection[i][1]==position[1]+1:
+                        print("right down")
                         return self.isPositionValid(checkDirection[i], colour, "rd")
                     else:
+                        print("left down")
                         return self.isPositionValid(checkDirection[i], colour, "ld")
         else:
             return False
