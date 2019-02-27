@@ -6,7 +6,7 @@ def main():
             playColour = input("What colour do you want to be (b/w)?: ")
     game.setPlayerColour(playColour)
     difficulty = input("Enter 1 to set difficulty to easy, 2 to set difficulty to hard: ")
-    while difficulty != "1" and difficulty != 2:
+    while difficulty != "1" and difficulty != "2":
         difficulty = input("Enter 1 to set difficulty to easy, 2 to set difficulty to hard: ")
     flag = True
     while flag:
@@ -18,10 +18,12 @@ def main():
             else:
                 moveFlag = True
                 while moveFlag:
-                    move = input("Make a move with y axis first and x axis second separated by a space in the format: y x or type 'q' to quit. ->")
+                    move = input("Make a move with y axis first and x axis second separated by a space in the format: y x or type 'q' to quit, 'h' to show all possible moves. ->")
                     if move == 'q':
                         flag = False
                         moveFlag = False
+                    elif move == "h":
+                        game.help()
                     else:
                         try:
                             valid = game.isPositionValid(tuple(map(int, move.split())), playColour)
@@ -47,6 +49,14 @@ def main():
                 else:
                     move = game.makeMoveSmart()
                     print("Computer chooses position:", move)                
-                
-main()              
+
+
+mainFlag = True
+while mainFlag:
+    main() 
+    resp = input("Would you like to play again?(y/n): ")
+    while resp!="y" and resp!="n":
+        resp = input("Would you like to play again?(y/n): ")
+    if resp == "n":
+        mainFlag = False
         
