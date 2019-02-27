@@ -1,5 +1,4 @@
 import random as r
-import reversiMove as m
 
 class Reversi():
     def __init__(self):
@@ -41,7 +40,7 @@ class Reversi():
             print(i, end=" ")
             print(" ".join(self.board[i]))
             
-    def isPositionValid(self, position, colour, cont=None):
+    def isPositionValid(self, position, colour):
         #check all around, so pos(y)-1->y+1, x-1 to x+1, excluding itself
         assert type(position) is tuple, "Not a tuple"
         assert len(position) == 2, "Not a coordinate"
@@ -49,111 +48,26 @@ class Reversi():
         assert type(position[1]) is int, "Must be an integer"
         assert position[0]>=0 and position[0]<=7, "Out of bounds, must be 0-7"
         assert position[1]>=0 and position[1]<=7, "Out of bounds, must be 0-7"
-        
-        if cont != None:
-            if self.board[position[0]][position[1]] == ".":
-                return False
-            elif self.board[position[0]][position[1]] == colour:
-                return True
-            else:
-                if cont == "up":
-                    if position[0] == 0:
-                        return False
-                    else:
-                        return self.isPositionValid((position[0]-1, position[1]), colour, "up")
-                        
-                elif cont == "down":
-                    if position[0] == 7:
-                        return False
-                    else:
-                        return self.isPositionValid((position[0]+1, position[1]), colour, "down")
-                        
-                elif cont == "left":
-                    if position[1] == 0:
-                        return False
-                    else:
-                        return self.isPositionValid((position[0], position[1]-1), colour, "left") 
-                        
-                elif cont == "lu":
-                    if position[0] == 0 or position[1] == 0:
-                        return False
-                    else:
-                        return self.isPositionValid((position[0]-1, position[1]-1), colour, "lu") 
-                        
-                elif cont == "ru":
-                    if position[1] == 7 or position[0] == 0:
-                        return False
-                    else:
-                        return self.isPositionValid((position[0]-1, position[1]+1), colour, "ru")                     
-                    
-                elif cont == "ld":
-                    if position[1] == 0 or position[0] == 7:
-                        return False
-                    else:
-                        return self.isPositionValid((position[0]+1, position[1]-1), colour, "ld") 
-                        
-                elif cont == "rd":
-                    if position[1] == 7 or position[0] == 7:
-                        return False
-                    else:
-                        return self.isPositionValid((position[0]+1, position[1]+1), colour, "rd") 
-                        
-                else:
-                    if position[1] == 7:
-                        return False
-                    else:
-                        return self.isPositionValid((position[0], position[1]+1), colour, "right")
-                    
-        elif self.board[position[0]][position[1]] == ".":
-            #Brand new start, gotta find which way to go
-            checkDirection = []
-            for i in range(-1,2):
-                for j in range(-1,2):
-                    if (i!=0 or j!=0) and (position[0]+i>=0 and position[0]+i<=7 and position[1]+j>=0 and position[1]+j<=7):
-                        if colour == "b":
-                            if self.board[position[0]+i][position[1]+j] == "w":
-                                checkDirection.append((position[0]+i, position[1]+j))
-                        else:
-                            if self.board[position[0]+i][position[1]+j] == "b":
-                                checkDirection.append((position[0]+i, position[1]+j))
-                                
-            print(checkDirection)
-            for i in range(len(checkDirection)):
-                
-                if checkDirection[i][0]<position[0]:
-                    print("up")
-                    if checkDirection[i][1]==position[1]:
-                        print("straight up")
-                        return self.isPositionValid(checkDirection[i], colour, "up")
-                    elif checkDirection[i][1]==position[1]+1:
-                        print("up and right")
-                        return self.isPositionValid(checkDirection[i], colour, "ru")
-                    else:
-                        print("up and left")
-                        return self.isPositionValid(checkDirection[i], colour, "lu")
-                    
-                if checkDirection[i][0]==position[0]:
-                    print("left or right")
-                    if checkDirection[i][1]==position[1]+1:
-                        print("right")
-                        return self.isPositionValid(checkDirection[i], colour, "right")
-                    else:
-                        print("left")
-                        return self.isPositionValid(checkDirection[i], colour, "left")
-                    
-                else:
-                    print("down")
-                    if checkDirection[i][1]==position[1]:
-                        print("straight down")
-                        return self.isPositionValid(checkDirection[i], colour, "down")
-                    elif checkDirection[i][1]==position[1]+1:
-                        print("right down")
-                        return self.isPositionValid(checkDirection[i], colour, "rd")
-                    else:
-                        print("left down")
-                        return self.isPositionValid(checkDirection[i], colour, "ld")
+        if colour == "b":
+            ac = "w"
         else:
-            return False
+            ac = "b"
+        #print(ac)
+        if self.board[position[0]][position[1]] == ".":
+            #Brand new start, gotta find which way to go
+            for yDir, xDir in [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]:
+                h = yDir
+                j = xDir
+                inFlag = False
+                while position[0]+h>=0 and position[0]+h<=7 and position[1]+j>=0 and position[1]+j<=7 and self.board[position[0]+h][position[1]+j] == ac:
+                    #print("Found valid next at:", position[0]+h, position[1]+j, "with direction", yDir, xDir,"From original position:", position, "is", self.board[position[0]+h][])
+                    h += yDir
+                    j += xDir
+                    inFlag = True
+                if inFlag and position[0]+h>=0 and position[0]+h<=7 and position[1]+j>=0 and position[1]+j<=7 and self.board[position[0]+h][position[1]+j] == colour:
+                    return True
+        
+        return False
 
     def isGameOver(self):
         curPlayer = self.getTurn()
@@ -183,7 +97,7 @@ class Reversi():
         else:
             col = "b"
             play = "w"
-        dif = m.makeMove(self.board, position, play, col)
+        dif = makeMove(self.board, position, play, col)
         self.players[play]["score"] += dif
         self.players[col]["score"] -= (dif-1)
         self.incrementTurn()
@@ -210,7 +124,7 @@ class Reversi():
         positions = self.findValidMoves(comp)
         randChoice = r.randrange(len(positions))
         choice = positions[randChoice]
-        dif = m.makeMove(self.board, choice, comp, play)
+        dif = makeMove(self.board, choice, comp, play)
         self.players[comp]["score"] += dif
         self.players[play]["score"] -= (dif-1)
         self.incrementTurn()
@@ -229,12 +143,57 @@ class Reversi():
         score = self.players[comp]["score"]
         #make a copy of the board, play each move see which yields the maximum difference, play that on actual
         for i in range(len(positions)):
-            copy = self.board[:]
-            dif = m.makeMove(copy, positions[i], comp, play)
+            copy = []
+            for j in range(len(self.board)):
+                copy.append(self.board[j][:])
+            dif = makeMove(copy, positions[i], comp, play)
             if dif>maxVal[0]:
                 maxVal = (dif, i)
-        m.makeMove(self.board, positions[maxVal[1]], comp, play)
+        dif = makeMove(self.board, positions[maxVal[1]], comp, play)
         self.players[comp]["score"] += dif
         self.players[play]["score"] -= (dif-1)
         self.incrementTurn()
         return positions[maxVal[1]]
+    
+    def help(self):
+        print("  ", end="")
+        for i in range(8):
+            if i != 7:
+                print(i, end=" ")
+            else:
+                print(i)
+        for y in range(8):
+            print(y, end=" ")
+            for x in range(8):
+                if self.isPositionValid((y,x), self.getTurn()):
+                    print("*", end=" ")
+                else:
+                    print(self.board[y][x], end=" ")
+            print()
+
+def makeMove(board, position, colour, anticolour):
+    ac = anticolour
+    board[position[0]][position[1]] = colour
+    scoreDifferential = 0
+    #print(positions)
+            
+    for yDir, xDir in [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]: #various directions
+        toFlip = []
+        h = yDir
+        j = xDir
+        inFlag = False
+        while position[0]+h>=0 and position[0]+h<=7 and position[1]+j>=0 and position[1]+j<=7 and board[position[0]+h][position[1]+j] == ac:
+            #print("Found valid next at:", position[0]+h, position[1]+j, "with direction", yDir, xDir)
+            toFlip.append((position[0]+h, position[1]+j))
+            h += yDir
+            j += xDir
+            inFlag = True
+        #if inFlag:
+            #print(board[position[0]+h][position[1]+j])
+        if inFlag and position[0]+h>=0 and position[0]+h<=7 and position[1]+j>=0 and position[1]+j<=7 and board[position[0]+h][position[1]+j] == colour:
+            scoreDifferential += len(toFlip)
+            for x in range(len(toFlip)):
+                board[toFlip[x][0]][toFlip[x][1]] = colour            
+                   
+    #print("Positions to flip:", toFlip)
+    return scoreDifferential + 1  
