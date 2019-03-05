@@ -111,9 +111,10 @@ class CQueue(BQueue):
         
     def __repr__(self):
         return str(self.queue) + " H=" + str(self.head) + " T=" + str(self.tail) + "(" + str(self.length)+"/"+str(self.capacity)+")"
+    
 def test():
     import time as t
-    numItems = 100000
+    numItems = 200000
     circ = CQueue(numItems)
     bounded = BQueue(numItems)
     while not bounded.isFull():
@@ -130,3 +131,4 @@ def test():
     while not bounded.isEmpty():
         bounded.dequeue()
     print("Bounded queue took %.2f time to dequeue %d items" % (t.time()-start, numItems))
+#test()
