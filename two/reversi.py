@@ -1,13 +1,18 @@
 import random as r
 
 class Reversi():
+    #class that runs the game
     def __init__(self):
+        #initialize the board
         self.board = []
         self.newGame()
+        #store player information
         self.players = {"b":{"player":False, "score":2},"w":{"player":False, "score":2}}
+        #keeps track of current player
         self.currentPlayer = 0
     
     def newGame(self):
+        #clears the board and fills the center appropriately
         self.board = []
         for i in range(8):
             self.board.append([])
@@ -20,9 +25,11 @@ class Reversi():
                     self.board[i].append(".")
         
     def getScore(self, colour):
+        #returns the score of a colour
         return self.players[colour]["score"]
     
     def setPlayerColour(self, colour):
+        #sets the player to be one colour, and the other to be the computer
         self.players[colour]["player"] = True
         if colour == "b":
             self.players["w"]["player"] = False
@@ -30,6 +37,7 @@ class Reversi():
             self.players["b"]["player"] = False
             
     def displayBoard(self):
+        #displays the indeces and the board
         print("  ", end="")
         for i in range(8):
             if i != 7:
@@ -41,23 +49,25 @@ class Reversi():
             print(" ".join(self.board[i]))
             
     def isPositionValid(self, position, colour):
-        #check all around, so pos(y)-1->y+1, x-1 to x+1, excluding itself
+        #make assertions about position being validly entered
         assert type(position) is tuple, "Not a tuple"
         assert len(position) == 2, "Not a coordinate"
         assert type(position[0]) is int, "Must be an integer"
         assert type(position[1]) is int, "Must be an integer"
         assert position[0]>=0 and position[0]<=7, "Out of bounds, must be 0-7"
         assert position[1]>=0 and position[1]<=7, "Out of bounds, must be 0-7"
+        #set the colours for use
         if colour == "b":
             ac = "w"
         else:
             ac = "b"
-        #print(ac)
+        #check if the position is a dot
         if self.board[position[0]][position[1]] == ".":
-            #Brand new start, gotta find which way to go
+            #loop for all directions around it
             for yDir, xDir in [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]:
                 h = yDir
                 j = xDir
+                #inFlag -> went into the loop at least once to be true (to ensure that one of the same colour isnt coutned as the same)
                 inFlag = False
                 while position[0]+h>=0 and position[0]+h<=7 and position[1]+j>=0 and position[1]+j<=7 and self.board[position[0]+h][position[1]+j] == ac:
                     #print("Found valid next at:", position[0]+h, position[1]+j, "with direction", yDir, xDir,"From original position:", position, "is", self.board[position[0]+h][])
@@ -70,6 +80,7 @@ class Reversi():
         return False
 
     def isGameOver(self):
+        #checks if the game is over for the current player by testing out every possible move to see if its valid
         curPlayer = self.getTurn()
         flag = False
         #if current player cannot make any moves, then the game is over.
@@ -83,14 +94,17 @@ class Reversi():
         return True
     
     def incrementTurn(self):
+        #starts a new turn
         self.currentPlayer = (self.currentPlayer + 1) % 2
         
     def getTurn(self):
+        #get the current turn colour
         if self.currentPlayer == 0:
             return "b"
         return "w"
     
     def makeMovePlayer(self, position):
+        #makes a move for the player
         if self.players["b"]["player"]:
             col = "w"
             play = "b"
@@ -105,6 +119,7 @@ class Reversi():
         
         
     def findValidMoves(self, colour):
+        #finds all the valid moves for a colour
         positions = []
         for i in range(8):
             for j in range(8):
@@ -156,6 +171,7 @@ class Reversi():
         return positions[maxVal[1]]
     
     def help(self):
+        #print out a board but with valid moves replaced with stars instead of dots, called when player needs help
         print("  ", end="")
         for i in range(8):
             if i != 7:
@@ -172,10 +188,11 @@ class Reversi():
             print()
 
 def makeMove(board, position, colour, anticolour):
+    #makes a move for a given colour
     ac = anticolour
     board[position[0]][position[1]] = colour
     scoreDifferential = 0
-    #print(positions)
+    #works in the same way as isValidPosition, except it adds the valid positions to a list, swaps their colour and returns how much score is gained
             
     for yDir, xDir in [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]: #various directions
         toFlip = []

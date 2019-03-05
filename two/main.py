@@ -1,62 +1,82 @@
 import reversi
 def main():
+    #create new instance of the game reversi
     game = reversi.Reversi()
-    playColour = input("What colour do you want to be (b/w), black starts?: ")
+    #print out starting information and get the colour of the player
+    print("Starting new game!")
+    print("Black goes first, then white")
+    playColour = input("Enter 'b' to play black, 'w' to choose white: ")
+    #ensure player chooses a valid colour
     while playColour != "b" and playColour != "w":
-            playColour = input("What colour do you want to be (b/w)?: ")
+            playColour = input("Enter 'b' to play black, 'w' to choose white: ")
     game.setPlayerColour(playColour)
-    difficulty = input("Enter 1 to set difficulty to easy, 2 to set difficulty to hard: ")
+    #ensure player chooses a  valid computer opponent difficulty
+    difficulty = input("Enter '1' to choose easy computer opponent, '2' for hard computer opponent: ")
     while difficulty != "1" and difficulty != "2":
-        difficulty = input("Enter 1 to set difficulty to easy, 2 to set difficulty to hard: ")
+        difficulty = input("Enter '1' to choose easy computer opponent, '2' for hard computer opponent: ")
+    #create the main game loop
     flag = True
     while flag:
+        #display the current status of the game and score
         game.displayBoard()
-        print("Black has %d points, white has %d points" % (game.getScore("b"), game.getScore("w")))
-        if game.getTurn() == playColour:
-            if game.isGameOver():
-                flag = False
-            else:
-                moveFlag = True
-                while moveFlag:
-                    move = input("Make a move with y axis first and x axis second separated by a space in the format: y x or type 'q' to quit, 'h' to show all possible moves. ->")
-                    if move == 'q':
-                        flag = False
-                        moveFlag = False
-                    elif move == "h":
-                        game.help()
-                    else:
-                        try:
-                            valid = game.isPositionValid(tuple(map(int, move.split())), playColour)
-                        except AssertionError as a:
-                            print("Looks like you entered something wrong: ", a.args[0])
-                        except ValueError:
-                            print("You need to enter an integer between 0 and 7 for each coordinate.")
-                        else:
-                            if not valid:
-                                print("That move is invalid, please try again!")
-                            else:
-                                moveFlag = False
-                if move != 'q':
-                    game.makeMovePlayer(tuple(map(int, move.split())))
-        else:
-            print("Computer Turn!")
-            if game.isGameOver():
-                flag = False
-            else:
-                if difficulty == "1":
-                    move = game.makeMoveNaive()
-                    print("Computer chooses position:", move)
+        print("Score: white %d, black %d" % (game.getScore("w"), game.getScore("b")))
+        #check game over
+        if game.isGameOver():
+            flag = False
+        #check if its the players turn
+        elif game.getTurn() == playColour:
+            #players turn, get input for what they want.
+            moveFlag = True
+            while moveFlag:
+                move = input("Enter 2 numbers from 0-7 separated by a space to make a move, where the first number is the row and the second number is the column\nEnter 'q' to quit or 'h' for help.->")
+                if move == 'q':
+                    #set all the flags to be False, exiting the game
+                    flag = False
+                    moveFlag = False
+                elif move == "h":
+                    #call the help function on the instance of game (shows all possible moves)
+                    game.help()
                 else:
-                    move = game.makeMoveSmart()
-                    print("Computer chooses position:", move)                
+                    try:
+                        #validate the move
+                        valid = game.isPositionValid(tuple(map(int, move.split())), playColour)
+                    except AssertionError as a:
+                        #if the asserts failed in isPositionValid this is returned
+                        print("Invalid position: ", a.args[0])
+                    except TypeError:
+                        #If the person failed to pass integers this is caught
+                        print("You need to enter an integer between 0 and 7 for each coordinate.")
+                    else:
+                        #the actual position was valid
+                        if not valid:
+                            #but it's not an appropriate move
+                            print("Invalid position: piece doesn't surround line of opponent pieces.")
+                        else:
+                            #we found our move
+                            moveFlag = False
+            if move != 'q':
+                #if we weren't exiting, make the move
+                game.makeMovePlayer(tuple(map(int, move.split())))
+        else:
+            #computers turn!
+            if difficulty == "1":
+                move = game.makeMoveNaive()
+                print("Computer making move:", move)
+            else:
+                move = game.makeMoveSmart()
+                print("Computer making move:", move)                
 
-
+#big big loop that is responsible for playing multiple games
 mainFlag = True
 while mainFlag:
+    #calls a new game
     main() 
+    #asking if they would like to play again
     resp = input("Would you like to play again?(y/n): ")
+    #validate
     while resp!="y" and resp!="n":
         resp = input("Would you like to play again?(y/n): ")
+    #exiting if not
     if resp == "n":
         mainFlag = False
         
