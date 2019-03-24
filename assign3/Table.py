@@ -11,7 +11,7 @@ class Table:
 		self.__player_card = None
 		self.__dealer_card = None
 		self.__discard = Queue()
-		self.__shoe = None
+		self.__shoe = self.make_shoe()
 		self.__bet = 0
 
 	
@@ -23,6 +23,11 @@ class Table:
 		else:
 			return 0
 	
+	def get_discard(self):
+		return self.__discard
+	
+	def get_shoe(self):
+		return self.__shoe
 	
 	def set_bet(self, bet):
 		assert type(bet) == int, "Bet must be an integer"
@@ -35,12 +40,15 @@ class Table:
 	
 	
 	def clear(self):
-		self.discard.put(self.__player_card)
+		self.__discard.put(self.__player_card)
 		self.__player_card = None
-		self.discard.put(self.__dealer_card)
+		self.__discard.put(self.__dealer_card)
 		self.__dealer_card = None
 	
 	
+	def clear_discard(self):
+		self.__discard = Queue()
+		
 	def create_deck(self):
 		myDeck = []
 		for rank in Card.order:
@@ -48,14 +56,22 @@ class Table:
 				myDeck.append(Card(rank, suit))
 		return myDeck
 
-
+	def get_shoe_size(self):
+		return self.__shoe.qsize()
+	
 	def validate_deck(self, deck):
 		if len(deck) != 52:
 			raise Exception("Deck must have 52 cards in it.")
 		for card in deck:
-			if str(card).upper() not in cls.acceptable:
+			if str(card).upper() not in Table.acceptable:
 				raise Exception("%s is not a valid card." % str(card))
 		return True	
+
+	def shoe_to_list(self):
+		aList = []
+		while not self.__shoe.empty():
+			aList.append(str(self.__shoe.get()))
+		return aList
 
 	def make_shoe(self):
 		bigDeck = []
@@ -87,8 +103,27 @@ class Table:
 		self.__shoe = shoe
 	
 	
-
+	def draw_card(self, actor):
+		if actor == "player":
+			self.__player_card = self.__shoe.get()
+		else:
+			self.__dealer_card = self.__shoe.get()
+			
+	def burn(self):
+		print("Burning card")
+		self.__discard.put(self.__shoe.get())
 		
+	def discard(self, actor):
+		if actor == "player":
+			self.__discard.put(self.__player_card)
+		else:
+			self.__discard.put(self.__dealer_card)
+		
+	def get_card(self, actor):
+		if actor == "player":
+			return self.__player_card
+		else:
+			return self.__dealer_card
 		
 
 	

@@ -19,5 +19,4 @@ class Player:
 	
 	def get_chips(self):
 		return self.__chips
-
-		
+	
