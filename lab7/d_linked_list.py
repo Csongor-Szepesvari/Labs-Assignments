@@ -285,4 +285,4 @@ def test():
     if is_pass == True:
         print ("=========== Congratulations! You have finished exercise 1! ============")
         
-#test()
+test()
