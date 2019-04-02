@@ -1,4 +1,7 @@
 from Card import Card
+from Player import Player
+from Table import Table
+from queue import Queue
 
 
 def test_card():
@@ -40,7 +43,64 @@ def test_card():
 	return True
 
 def test_player():
-	#TODO
+	myPlayer = Player()
+	
+	#see if the initial chips are 0
+	assert myPlayer.get_chips() == 0, "not init to 0"
+	
+	#test adding chips
+	myPlayer.add_chips(10)
+	assert myPlayer.get_chips() == 10, "failed adding"
+	
+	#test removing chips
+	myPlayer.remove_chips(110)
+	assert myPlayer.get_chips() == -100, "failed removing"
 
-def test_table()
-	#TODO
+def test_table():
+	myT = Table()
+	q = Queue()
+	q.put(Card("A", "D"))
+	q.put(Card("Q", "S"))
+	myT.set_shoe(q)
+	
+	#test bet setting and getting
+	myT.set_bet(100)
+	assert myT.get_bet() == 100
+	
+	#test clearing of cards from dealer and player, test card getting
+	myT.draw_card("player")
+	myT.draw_card("dealer")
+	assert str(myT.get_card("player")) == "AD", "failed to draw"
+	assert str(myT.get_card("dealer")) == "QS", "failed to draw"
+	myT.clear()
+	assert myT.get_card("player") == None, "failed to clear"
+	assert myT.get_card("dealer") == None, "failed to clear"
+	assert str(myT.get_discard().get()) == "AD", "discard queue broken"
+	assert str(myT.get_discard().get()) == "QS", "discard queue broken"
+	
+	#test resetting discard
+	myT.get_discard().put(Card("2", "H"))
+	myT.clear_discard()
+	assert myT.get_discard().empty(), "failed to wipe discard"
+	
+	
+	#test shoe making
+	myT.set_shoe(myT.make_shoe())
+	#print(myT.shoe_to_list())
+	#print(myT.get_shoe_size())
+	assert myT.get_shoe_size() == 6 * 52, "not full"
+	aList = []
+	for i in range(myT.get_shoe_size()):
+		aList.append(str(myT.get_shoe().get()))
+	aList = list(set(aList))
+	myT.validate_deck(aList)
+	
+	#test result checker
+	assert myT.resolve_round(Card("A", "D"), Card("A", "S")) == 0, "Should've tied"
+	assert myT.resolve_round(Card("2", "D"), Card("A", "S")) == -1, "Player should've lost"
+	assert myT.resolve_round(Card("A", "D"), Card("2", "S")) == 1, "Player should've won"
+	
+	
+test_card()
+test_player()
+test_table()
